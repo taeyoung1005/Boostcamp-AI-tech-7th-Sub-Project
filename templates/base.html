@@ -44,19 +44,18 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                    {% block content %}
+                    {% block container %}
                     {% endblock %}
                 </div>
                 <!-- /.container-fluid -->
 
             </div>
             <!-- End of Main Content -->
-
+            <!-- Footer -->
+            {% include 'footer.html' %}
+            <!-- End of Footer -->
         </div>
         <!-- End of Content Wrapper -->
-        <!-- Footer -->
-        {% include 'footer.html' %}
-        <!-- End of Footer -->
 
     </div>
     <!-- End of Page Wrapper -->

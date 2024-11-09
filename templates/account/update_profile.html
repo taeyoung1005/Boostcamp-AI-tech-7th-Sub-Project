@@ -1,0 +1,27 @@
+<!-- templates/account/update_profile.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Update Profile{% endblock %}
+
+{% block container %}
+<div class="container">
+    <h2 class="mt-4">Update Your Profile</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+        <a href="{% url 'account:update_profile' %}" class="btn btn-secondary mt-3">Cancel</a>
+    </form>
+    <!-- 성공/오류 메시지 표시 -->
+    {% if messages %}
+    {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

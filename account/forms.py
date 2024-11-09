@@ -28,3 +28,26 @@ class RegisterForm(forms.ModelForm):
         if commit:
             user.save()
         return user
+
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            "email",
+            "username",
+            "first_name",
+            "last_name",
+            "bio",
+            "profile_image",
+        ]
+        widgets = {
+            "email": forms.EmailInput(
+                attrs={"class": "form-control", "readonly": "readonly"}
+            ),
+            "username": forms.TextInput(attrs={"class": "form-control"}),
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "bio": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "profile_image": forms.FileInput(attrs={"class": "form-control"}),
+        }

@@ -8,10 +8,6 @@ def index(request):
         return render(
             request,
             "main/index.html",
-            {
-                "username": request.user.username,
-                "profile_image": request.user.profile_image,
-            },
         )
     else:
         return render(request, "main/index.html")

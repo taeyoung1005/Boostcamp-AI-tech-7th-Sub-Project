@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
-from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
+
+from .forms import RegisterForm, UserUpdateForm
 
 
 def login(request):
@@ -38,7 +39,6 @@ def login(request):
 
 def register(request):
     if request.method == "POST":
-        print(request.POST)
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()  # 유효한 경우 사용자 저장
@@ -61,3 +61,21 @@ def logout(request):
     auth_logout(request)
 
     return redirect("main:index")
+
+
+@login_required(login_url="account:login")
+def update_profile(request):
+    user = request.user
+
+    if request.method == "POST":
+        form = UserUpdateForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully.")
+            return redirect("account:update_profile")  # 프로필 페이지로 리디렉션
+        else:
+            messages.error(request, "Please correct the error below.")
+    else:
+        form = UserUpdateForm(instance=user)
+
+    return render(request, "account/update_profile.html", {"form": form})

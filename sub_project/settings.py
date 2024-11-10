@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     "classification",
     "main",
     "account",
+    "QA",
+    "feedback",
 ]
 
 MIDDLEWARE = [

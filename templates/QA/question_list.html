@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Questions{% endblock %}
+
+{% block container %}
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Questions</h1>
+        <a href="{% url 'QA:create_question' %}" class="btn btn-primary">Create New Question</a>
+    </div>
+
+    <!-- Questions Table -->
+    <div class="row">
+        <table class="table table-bordered table-striped table-hover">
+            <thead class="bg-light">
+                <tr>
+                    <th style="width: 50%;">Title</th>
+                    <th style="width: 20%;">Author</th>
+                    <th style="width: 20%;">Created At</th>
+                    <th style="width: 10%;">Views</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question in questions %}
+                    <tr onclick="window.location.href='{% url 'QA:question_detail' question.id %}';" style="cursor: pointer;">
+                        <td>{{ question.title }}</td>
+                        <td>{{ question.author.username }}</td>
+                        <td>{{ question.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ question.views_count }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No questions available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

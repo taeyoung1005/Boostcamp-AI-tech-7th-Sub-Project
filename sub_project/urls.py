@@ -4,7 +4,10 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import handler404
 from django.contrib.auth import views as auth_views
+from django.shortcuts import render
+
 from .forms import CustomPasswordResetForm, CustomSetPasswordForm
 
 
@@ -12,6 +15,9 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("main.urls")),
     path("account/", include("account.urls")),
+    path("classification/", include("classification.urls")),
+    path("QA/", include("QA.urls")),
+    path("feedback/", include("feedback.urls")),
     path(
         "password_reset/",
         auth_views.PasswordResetView.as_view(form_class=CustomPasswordResetForm),
@@ -36,3 +42,10 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+def custom_404_view(request, exception):
+    return render(request, "404.html", status=404)
+
+
+handler404 = custom_404_view

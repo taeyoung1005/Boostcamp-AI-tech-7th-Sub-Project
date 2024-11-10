@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+{% block container %}
+<h2 class="mt-4">Notifications</h2>
+
+<div class="list-group mt-3">
+    {% for notification in notifications %}
+        <div class="list-group-item list-group-item-action {% if notification.is_read %}bg-light{% else %}bg-white{% endif %}">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">
+                    <span class="mr-2">
+                        {% if notification.icon == "info" %}
+                            <i class="fas fa-info-circle text-primary"></i>
+                        {% elif notification.icon == "alert" %}
+                            <i class="fas fa-exclamation-triangle text-warning"></i>
+                        {% elif notification.icon == "deposit" %}
+                            <i class="fas fa-dollar-sign text-success"></i>
+                        {% elif notification.icon == "warning" %}
+                            <i class="fas fa-exclamation-circle text-danger"></i>
+                        {% elif notification.icon == "success" %}
+                            <i class="fas fa-check-circle text-success"></i>
+                        {% else %}
+                            <i class="fas fa-file-alt text-secondary"></i>
+                        {% endif %}
+                    </span>
+                    {{ notification.title }}
+                </h5>
+                <small>{{ notification.created_at }}</small>
+            </div>
+            <p class="mb-1">{{ notification.message }}</p>
+            <small class="text-muted">{% if notification.is_read %}Read{% else %}Unread{% endif %}</small>
+        </div>
+    {% empty %}
+        <p class="text-muted">No notifications to display.</p>
+    {% endfor %}
+</div>
+{% endblock %}

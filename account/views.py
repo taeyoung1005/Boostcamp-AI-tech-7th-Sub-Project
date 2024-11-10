@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
 from .forms import RegisterForm, UserUpdateForm
+from main.models import Notification
 
 
 def login(request):
@@ -41,8 +42,17 @@ def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # 유효한 경우 사용자 저장
+            user = form.save()  # 유효한 경우 사용자 저장
             messages.success(request, "Account created successfully. Please log in.")
+
+            # 환영 알림 생성
+            Notification.objects.create(
+                user=user,
+                title="Welcome to Our Platform!",
+                message="Thank you for joining us! We hope you enjoy our services.",
+                icon="success",  # 적절한 아이콘 선택 (예: success, info 등)
+            )
+
             return redirect("account:login")  # 로그인 페이지로 리디렉션
         else:
             for field, errors in form.errors.items():

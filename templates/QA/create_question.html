@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+
+{% block title %}Create Question{% endblock %}
+
+{% block container %}
+    <!-- Page Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-primary">Create a New Question</h2>
+        <a href="{% url 'QA:question_list' %}" class="btn btn-secondary">Back to Questions List</a>
+    </div>
+
+    <!-- Question Form -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input type="text" name="title" id="title" class="form-control" placeholder="Enter Question title" required>
+                    {% comment %} {{ form.title|add_class:"form-control" }} {% endcomment %}
+                </div>
+                <div class="form-group">
+                    <label for="content">Content</label>
+                    <textarea name="content" id="content" rows="5" class="form-control" placeholder="Describe your Question" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Submit Question</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}

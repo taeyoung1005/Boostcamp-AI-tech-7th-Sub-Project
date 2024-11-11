@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load custom_filters %}
 
-{% block title %}Edit Question{% endblock %}
+{% block title %}Edit Answer{% endblock %}
 
 {% block container %}
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-primary">Edit Question</h2>
-        <a href="{% url 'QA:question_list' %}" class="btn btn-secondary">Back to Question List</a>
+        <h2 class="text-primary">Edit Answer</h2>
+        <a href="{% url 'QA:question_list'%}" class="btn btn-secondary">Back to Question List</a>
     </div>
     <div class="card shadow-sm">
         <div class="card-body">
@@ -14,15 +14,11 @@
                 {% csrf_token %}
                 <!-- 기존 form 필드를 불러오도록 form 객체 사용 -->
                 <div class="form-group">
-                    <label for="title">Title</label>
-                    {{ form.title|add_class:"form-control" }}
-                </div>
-                <div class="form-group">
                     <label for="content">Content</label>
                     {{ form.content|add_class:"form-control" }}
                 </div>
                 <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-                <a href="{% url 'QA:question_detail' question.id %}" class="btn btn-secondary mt-3">Cancel</a>
+                <a href="{% url 'QA:question_detail' question_id %}" class="btn btn-secondary mt-3">Cancel</a>
             </form>
         </div>
     </div>

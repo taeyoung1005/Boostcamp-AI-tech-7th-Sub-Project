@@ -13,8 +13,40 @@
                 <i class="fas fa-user"></i> {{ question.author.username }} |
                 <i class="fas fa-calendar-alt"></i> {{ question.created_at|date:"Y-m-d H:i" }}
             </p>
+            {% if request.user == question.author %}
+                <a href="{% url 'QA:update_question' question.id %}" class="btn btn-warning">Edit</a>
+                <!-- Delete button to trigger modal -->
+                <button class="btn btn-danger" data-toggle="modal" data-target="#deleteQuestionModal">Delete</button>
+            {% endif %}
         </div>
     </div>
+
+    <!-- Delete Confirmation Modal -->
+    {% if request.user == question.author %}
+    <div class="modal fade" id="deleteQuestionModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this question? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <!-- Delete button as a form with POST method -->
+                    <form method="post" action="{% url 'QA:delete_question' question.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Answers Section -->
     <div class="mb-3">
@@ -30,8 +62,38 @@
                         <i class="fas fa-user"></i> {{ answer.author.username }} |
                         <i class="fas fa-calendar-alt"></i> {{ answer.created_at|date:"Y-m-d H:i" }}
                     </div>
+                    {% if request.user == answer.author %}
+                        <a href="{% url 'QA:update_answer' question.id answer.id %}" class="btn btn-warning">Edit</a>
+                        <!-- Delete button to trigger modal -->
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#deleteAnswerModal{{ answer.id }}">Delete</button>
+                    {% endif %}
                 </div>
             </div>
+            {% if request.user == answer.author %}
+                <div class="modal fade" id="deleteAnswerModal{{ answer.id }}" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete this answer? This action cannot be undone.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <!-- Delete button as a form with POST method -->
+                                <form method="post" action="{% url 'QA:delete_answer' question.id answer.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         {% endfor %}
     {% else %}
         <div class="alert alert-info text-center">No answers yet. Be the first to answer!</div>

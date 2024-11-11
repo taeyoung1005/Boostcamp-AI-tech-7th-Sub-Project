@@ -10,12 +10,18 @@ from .forms import QuestionForm, AnswerForm
 
 @login_required(login_url="account:login")
 def question_list(request):
+    """
+    질문 목록을 보여주는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     questions = Question.objects.filter(is_deleted=False).order_by("-created_at")
     return render(request, "QA/question_list.html", {"questions": questions})
 
 
 @login_required(login_url="account:login")
 def question_detail(request, question_id):
+    """
+    질문 상세 페이지를 보여주는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     question = get_object_or_404(Question, id=question_id)
     answers = question.answers.filter(is_deleted=False).order_by("-created_at")
     question.views_count += 1
@@ -40,6 +46,9 @@ def question_detail(request, question_id):
 
 @login_required(login_url="account:login")
 def create_question(request):
+    """
+    새로운 질문을 작성하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     if request.method == "POST":
         form = QuestionForm(request.POST)
         if form.is_valid():
@@ -54,6 +63,9 @@ def create_question(request):
 
 @login_required(login_url="account:login")
 def update_question(request, question_id):
+    """
+    질문을 수정하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     question = get_object_or_404(Question, id=question_id, author=request.user)
     if request.method == "POST":
         form = QuestionForm(request.POST, instance=question)
@@ -70,6 +82,9 @@ def update_question(request, question_id):
 
 @login_required(login_url="account:login")
 def delete_question(request, question_id):
+    """
+    질문을 삭제하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     question = get_object_or_404(Question, id=question_id, author=request.user)
     if request.method == "POST":
         question.is_deleted = True
@@ -80,6 +95,9 @@ def delete_question(request, question_id):
 
 @login_required(login_url="account:login")
 def create_answer(request, question_id):
+    """
+    질문에 답변을 작성하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     question = get_object_or_404(Question, id=question_id)
     if request.method == "POST":
         form = AnswerForm(request.POST)
@@ -98,6 +116,9 @@ def create_answer(request, question_id):
 
 @login_required(login_url="account:login")
 def update_answer(request, question_id, answer_id):
+    """
+    답변을 수정하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     answer = get_object_or_404(Answer, id=answer_id, question_id=question_id)
     if request.user != answer.author:
         return redirect("QA:question_list")
@@ -119,6 +140,9 @@ def update_answer(request, question_id, answer_id):
 
 @login_required(login_url="account:login")
 def delete_answer(request, question_id, answer_id):
+    """
+    답변을 삭제하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     answer = get_object_or_404(
         Answer, id=answer_id, question_id=question_id, author=request.user
     )

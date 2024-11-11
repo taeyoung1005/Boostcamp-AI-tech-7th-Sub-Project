@@ -9,6 +9,9 @@ from .models import Notification, Visitor
 
 
 def get_client_ip(request):
+    """
+    클라이언트의 IP 주소를 반환합니다.
+    """
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
         ip = x_forwarded_for.split(",")[0]
@@ -18,6 +21,9 @@ def get_client_ip(request):
 
 
 def track_visitor(request):
+    """
+    방문자를 추적하고, 오늘 방문한 방문자를 기록합니다.
+    """
     ip_address = get_client_ip(request)
     today = timezone.now().date()
 
@@ -28,11 +34,18 @@ def track_visitor(request):
 
 
 def all_visitors():
+    """
+    전체 방문자 수를 반환합니다.
+    """
+
     all_visitors_count = Visitor.objects.all().count()
     return all_visitors_count
 
 
 def index(request):
+    """
+    메인 Dashboard 페이지를 보여주는 뷰입니다.
+    """
     track_visitor(request)
 
     # 방문자 수 데이터 생성 (최근 7일 기준)
@@ -60,6 +73,9 @@ def index(request):
 
 @login_required(login_url="/account/login/")
 def mark_as_read(request, notification_id):
+    """
+    특정 알림을 읽은 상태로 표시합니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     if request.user.is_authenticated:
         notification = get_object_or_404(
             Notification, id=notification_id, user=request.user
@@ -72,6 +88,9 @@ def mark_as_read(request, notification_id):
 
 @login_required(login_url="/account/login/")
 def get_unread_notifications(request):
+    """
+    읽지 않은 알림 목록을 반환합니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     if request.user.is_authenticated:
         unread_notifications = Notification.objects.filter(
             user=request.user, is_read=False
@@ -94,6 +113,9 @@ def get_unread_notifications(request):
 
 @login_required(login_url="/account/login/")
 def mark_all_as_read(request):
+    """
+    모든 알림을 읽은 상태로 표시합니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     if request.user.is_authenticated:
         Notification.objects.filter(user=request.user, is_read=False).update(
             is_read=True
@@ -104,6 +126,9 @@ def mark_all_as_read(request):
 
 @login_required(login_url="/account/login/")
 def get_all_notifications(request):
+    """
+    모든 알림 목록을 반환합니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     notifications = Notification.objects.filter(user=request.user).order_by(
         "-created_at"
     )

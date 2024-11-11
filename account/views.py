@@ -8,6 +8,9 @@ from main.models import Notification
 
 
 def login(request):
+    """
+    사용자 로그인을 처리하는 뷰입니다.
+    """
     if request.method == "POST":
         email = request.POST.get("email")
         password = request.POST.get("password")
@@ -39,6 +42,9 @@ def login(request):
 
 
 def register(request):
+    """
+    사용자 등록을 처리하는 뷰입니다.
+    """
     if request.method == "POST":
         form = RegisterForm(request.POST, request.FILES)
         if form.is_valid():
@@ -66,6 +72,9 @@ def register(request):
 
 @login_required(login_url="account:login")
 def logout(request):
+    """
+    사용자 로그아웃을 처리하는 뷰입니다.
+    """
 
     # 로그아웃 처리
     auth_logout(request)
@@ -75,6 +84,9 @@ def logout(request):
 
 @login_required(login_url="account:login")
 def update_profile(request):
+    """
+    사용자 프로필을 업데이트하는 뷰입니다.
+    """
     user = request.user
 
     if request.method == "POST":

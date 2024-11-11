@@ -10,7 +10,7 @@ from .forms import FeedbackForm
 @login_required(login_url="account:login")
 def feedback_list(request):
     """
-    피드백 목록을 보여주는 뷰입니다.
+    피드백 목록을 보여주는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
     """
     feedbacks = Feedback.objects.filter(is_deleted=False).order_by("-created_at")
     return render(request, "feedback/feedback_list.html", {"feedbacks": feedbacks})
@@ -37,7 +37,7 @@ def create_feedback(request):
 @login_required(login_url="account:login")
 def feedback_detail(request, feedback_id):
     """
-    피드백 상세 페이지를 보여주는 뷰입니다.
+    피드백 상세 페이지를 보여주는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
     """
     feedback = Feedback.objects.get(id=feedback_id)
     feedback.views_count += 1
@@ -47,6 +47,9 @@ def feedback_detail(request, feedback_id):
 
 @login_required(login_url="account:login")
 def update_feedback(request, feedback_id):
+    """
+    피드백을 수정하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     feedback = get_object_or_404(Feedback, id=feedback_id, author=request.user)
     if request.method == "POST":
         form = FeedbackForm(request.POST, instance=feedback)
@@ -63,6 +66,9 @@ def update_feedback(request, feedback_id):
 
 @login_required(login_url="account:login")
 def delete_feedback(request, feedback_id):
+    """
+    피드백을 삭제하는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
+    """
     feedback = get_object_or_404(Feedback, id=feedback_id, author=request.user)
     if request.method == "POST":
         feedback.is_deleted = True

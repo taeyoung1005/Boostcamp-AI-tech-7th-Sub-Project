@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Introduction{% endblock %}
+
+{% block container %}
+    <!-- Header -->
+    <div class="text-center mb-5">
+        <h1 class="text-primary">Sketch 이미지 분류 경진대회</h1>
+        <p class="lead text-muted"><b>스케치 데이터를 활용하여 객체를 분류하는 도전</b></p>
+    </div>
+
+    <!-- Section 1: 대회 소개 -->
+    <div class="mb-5">
+        <h2 class="text-secondary">대회 소개</h2>
+        <p>Sketch 이미지 분류 경진대회는 주어진 데이터를 활용하여 모델을 제작하고 어떤 객체를 나타내는지 분류하는 대회입니다.</p>
+        <p>Computer Vision에서는 다양한 형태의 이미지 데이터가 활용되고 있습니다. 이 중, 비정형 데이터의 정확한 인식과 분류는 여전히 해결해야 할 주요 과제로 자리잡고 있습니다. 특히 사진과 같은 일반 이미지 데이터에 기반하여 발전을 이루어나아가고 있습니다.</p>
+        <p>하지만 일상의 사진과 다르게 스케치는 인간의 상상력과 개념 이해를 반영하는 추상적이고 단순화된 형태의 이미지입니다. 이러한 스케치 데이터는 색상, 질감, 세부적인 형태가 비교적 결여되어 있으며, 대신에 기본적인 형태와 구조에 초점을 맞춥니다.</p>
+    </div>
+
+    <!-- Section 2: 데이터셋 설명 -->
+    <div class="mb-5">
+        <h2 class="text-secondary">데이터셋 설명</h2>
+        <p>원본 ImageNet Sketch 데이터셋은 50,889개의 이미지 데이터로 구성되어 있으며 1,000개의 객체에 대해 각각 대략 50개씩의 이미지를 가지고 있습니다. 일반적인 객체들의 핸드 드로잉 이미지로 구성되어 있으며, 실제 객체를 대표하는 다양한 스타일과 특징을 보여줍니다.</p>
+        <p>이번 경진대회에서 제공되는 데이터셋은 원본 데이터를 직접 검수하고 정제하여 1,000개의 클래스에서 정제 후 이미지 수량이 많은 상위 500개의 객체를 선정했으며 총 25,035개의 이미지 데이터가 활용됩니다.</p>
+        <ul>
+            <li>학습 데이터: 15,021개</li>
+            <li>평가 데이터 (Private & Public): 10,014개</li>
+        </ul>
+        <div class="row">
+            <!-- Example Image 1 -->
+            <div class="col-md-12">
+                <img src="{% static 'img/image_classification_data.png' %}" alt="Sketch Example 1" class="img-fluid rounded">
+                <p class="text-center mt-2 text-muted">ImageNet Sketch Data</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-5">
+        <h2 class="text-secondary">학습 방법</h2>
+        <p>모델</p>
+        <p>기법</p>
+    </div>
+{% endblock %}

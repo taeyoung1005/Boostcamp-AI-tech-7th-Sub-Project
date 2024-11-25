@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+
+{% block title %}Image Classification{% endblock %}
+
+{% block css %}
+<style>
+    /* 컨테이너에 위치 설정 */
+    .image-container {
+        position: relative;
+    }
+    
+    .tooltip-prediction {
+        position: absolute;
+        bottom: 5px; /* 이미지 하단에서 약간 위 */
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 2px 8px;
+        font-size: 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        display: none; /* 기본적으로 보이지 않음 */
+        z-index: 10;
+    }
+    
+    /* Hover 상태에서 툴팁 표시 */
+    .image-container:hover .tooltip-prediction {
+        display: block;
+    }
+    
+    /* 이미지 크기 제한 */
+    .image-container img {
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+    </style>
+{% endblock %}
+
+{% block container %}
+<div class="container mt-5">
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+        <h1 class="text-primary">Image Classification</h1>
+        <p class="text-muted">Upload an image to classify and see the top-5 results.</p>
+    </div>
+
+    <!-- Image Upload & Preview Section -->
+    <div class="row justify-content-center">
+        <!-- Image Upload & Preview -->
+        <div class="col-lg-6 p-1">
+            <div class="card shadow-sm" style="height: 500px;">
+                <div class="card-header">
+                    <h5 class="mb-0">Upload and Preview Image</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p id="noImageText" class="text-muted {% if image_url %}d-none{% endif %}">
+                        No image selected.
+                    </p>
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        <!-- Image Preview -->
+                        <div class="mb-4" style="height: 300px;">
+                            <img 
+                                id="imagePreview" 
+                                src="{{ image_url|default:'#' }}" 
+                                alt="Image Preview" 
+                                class="img-fluid rounded {% if not image_url %}d-none{% endif %}" 
+                                style="max-height: 300px;">
+                        </div>
+                        <!-- Image Upload -->
+                        <div class="form-group" style="height: 200px;">
+                            <label for="imageInput" class="btn btn-outline-primary">Choose Image</label>
+                            <input type="file" name="image" id="imageInput" class="form-control-file d-none" accept="image/*" onchange="previewImage(event)">
+                            <label for="submit" class="btn btn-primary">Submit</label>
+                            <input type="submit" id="submit" class="btn btn-primary d-none">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Classification Results -->
+        <div class="col-lg-6 p-1">
+            <div class="card shadow-sm" style="height: 500px;">
+                <div class="card-header">
+                    <h5 class="mb-0">Classification Results</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if prediction %}
+                    <canvas id="classificationChart" style="max-height: 400px;"></canvas>
+                    {% else %}
+                    <p class="text-muted">No classification results to display.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-5 mb-5">
+            <h5>Previously Submitted Images</h5>
+            <div class="row">
+                {% for img in previous_images|slice:":30" %}
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-1 p-1">
+                        <div class="card shadow-sm position-relative image-container">
+                            <img src="{{ img.classification_image.url }}" alt="Submitted Image" class="img-fluid rounded">
+                            <!-- Tooltip -->
+                            <div class="tooltip-prediction">
+                                {{ img.prediction }}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+    function previewImage(event) {
+        const input = event.target;
+        const preview = document.getElementById("imagePreview");
+        const noImageText = document.getElementById("noImageText");
+
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.src = e.target.result;
+                preview.classList.remove("d-none");
+                noImageText.classList.add("d-none");
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    const classificationResults = JSON.parse('{{ prediction|safe }}');
+
+    // Extract labels and data from the dictionary
+    let labels = Object.keys(classificationResults);
+    let data = Object.values(classificationResults).map(value => value * 100); // Convert to percentage
+    
+    // Combine labels and data into an array of objects for sorting
+    let combined = labels.map((label, index) => ({ label: label, value: data[index] }));
+    
+    // Sort the combined array by value in descending order
+    combined.sort((a, b) => b.value - a.value);
+    
+    // Separate sorted labels and data
+    labels = combined.map(item => item.label);
+    data = combined.map(item => item.value);
+    
+    const ctx = document.getElementById('classificationChart').getContext('2d');
+    
+    // Dynamically generate colors based on the number of data points
+    const generateColors = (count) => {
+        const colors = ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'];
+        const hoverColors = ['#2e59d9', '#17a673', '#2c9faf', '#f4b619', '#e02d1b'];
+        return {
+            background: Array.from({ length: count }, (_, i) => colors[i % colors.length]),
+            hover: Array.from({ length: count }, (_, i) => hoverColors[i % hoverColors.length]),
+        };
+    };
+    
+    const { background, hover } = generateColors(data.length);
+    
+    const predictionData = {
+        labels: labels,
+        datasets: [{
+            label: 'Prediction Confidence',
+            data: data,
+            backgroundColor: background,
+            hoverBackgroundColor: hover,
+            borderWidth: 1,
+            borderColor: '#ffffff',
+            borderRadius: 5
+        }]
+    };
+    
+    const predictionChart = new Chart(ctx, {
+        type: 'bar',
+        data: predictionData,
+        options: {
+            indexAxis: 'y', // Makes the chart horizontal
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100, // Confidence scores are between 0 and 100%
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%'; // Display as percentage
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Confidence (%)',
+                        font: {
+                            size: 14,
+                            weight: 'bold',
+                        }
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false // Hide legend as it's a single dataset
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw.toFixed(1)}%`;
+                        }
+                    }
+                }
+            },
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+</script>
+{% endblock %}

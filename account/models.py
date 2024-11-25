@@ -39,7 +39,7 @@ def profile_image_path(instance, filename):
     ext = filename.split(".")[-1]
     unique_filename = f"{uuid.uuid4()}.{ext}"
     # "profile_images/{user_id}/filename.webp" 형식으로 저장
-    return os.path.join("profile_images", str(instance.id or "new"), unique_filename)
+    return os.path.join("profile_images", unique_filename)
 
 
 class User(AbstractBaseUser, PermissionsMixin):

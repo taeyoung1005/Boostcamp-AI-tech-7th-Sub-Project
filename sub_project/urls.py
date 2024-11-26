@@ -16,6 +16,7 @@ urlpatterns = [
     path("", include("main.urls")),
     path("account/", include("account.urls")),
     path("classification/", include("classification.urls")),
+    path("objectdetection/", include("objectdetection.urls")),
     path("QA/", include("QA.urls")),
     path("feedback/", include("feedback.urls")),
     path(

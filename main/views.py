@@ -6,6 +6,8 @@ from django.utils import timezone
 from django.db.models import Count
 
 from .models import Notification, Visitor
+from classification.models import ClassificationImage
+from objectdetection.models import ObjectDetectionImage
 
 
 def get_client_ip(request):
@@ -42,6 +44,24 @@ def all_visitors():
     return all_visitors_count
 
 
+def all_images():
+    """
+    전체 이미지 수를 반환합니다.
+    """
+    cls_images_count = ClassificationImage.objects.all().count()
+    obj_images_count = ObjectDetectionImage.objects.all().count()
+    ocr_images_count = 0
+    seg_images_count = 0
+
+    task_images_count = [
+        cls_images_count,
+        obj_images_count,
+        ocr_images_count,
+        seg_images_count,
+    ]
+    return task_images_count
+
+
 def index(request):
     """
     메인 Dashboard 페이지를 보여주는 뷰입니다.
@@ -59,6 +79,7 @@ def index(request):
     visitor_counts = [entry["count"] for entry in visitor_data]
     visitor_dates = [entry["visit_date"].strftime("%Y-%m-%d") for entry in visitor_data]
     all_visitors_count = all_visitors()
+    all_images_count = all_images()
 
     return render(
         request,
@@ -67,6 +88,8 @@ def index(request):
             "visitor_counts": visitor_counts,
             "visitor_dates": visitor_dates,
             "all_visitors_count": all_visitors_count,
+            "all_images_count": sum(all_images_count),
+            "task_images_count": all_images_count,
         },
     )
 

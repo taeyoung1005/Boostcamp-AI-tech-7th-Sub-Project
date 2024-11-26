@@ -4,12 +4,12 @@ from django.contrib.auth.decorators import login_required
 from .models import ClassificationImage
 
 
-@login_required(login_url="/login/")
-def indroduction(request):
-    return render(request, "classification/indroduction.html")
+@login_required(login_url="account:login")
+def introduction(request):
+    return render(request, "classification/introduction.html")
 
 
-@login_required(login_url="/login/")
+@login_required(login_url="account:login")
 def spaces(request):
     if request.method == "POST":
         if request.FILES.get("image"):

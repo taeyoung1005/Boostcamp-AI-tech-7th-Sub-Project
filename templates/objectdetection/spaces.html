@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Object Detection{% endblock %}
+
+{% block css %}
+<style>
+    .image-container {
+        position: relative;
+    }
+
+    .tooltip-prediction {
+        position: absolute;
+        bottom: 5px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 2px 8px;
+        font-size: 10px;
+        border-radius: 5px;
+        white-space: nowrap;
+        display: none;
+        z-index: 10;
+    }
+
+    .image-container:hover .tooltip-prediction {
+        display: block;
+    }
+
+    .image-container img {
+        max-width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block container %}
+    <!-- Page Header -->
+    <div class="text-center mb-4">
+        <h1 class="text-primary">Object Detection</h1>
+        <p class="text-muted">Upload an image and detect objects with bounding boxes and categories.</p>
+        <a href="https://github.com/boostcampaitech7/level2-objectdetection-cv-01" class="badge badge-dark" target="_blank" style="font-size: 1rem; text-decoration: none;">
+            <i class="fab fa-github"></i> View on GitHub
+        </a>
+    </div>
+
+    <!-- Image Upload & Preview Section -->
+    <div class="row justify-content-center">
+        <!-- Image Upload & Preview -->
+        <div class="col-lg-6 p-1">
+            <div class="card shadow-sm" style="height: 500px;">
+                <div class="card-header">
+                    <h5 class="mb-0">Upload and Preview Image</h5>
+                </div>
+                <div class="card-body text-center">
+                    <p id="noImageText" class="text-muted {% if image_url %}d-none{% endif %}">
+                        No image selected.
+                    </p>
+                    <form method="post" enctype="multipart/form-data" id="uploadForm">
+                        {% csrf_token %}
+                        <!-- Image Preview -->
+                        <div class="mb-4" style="height: 300px;">
+                            <img 
+                                id="imagePreview" 
+                                src="{{ image_url|default:'#' }}" 
+                                alt="Image Preview" 
+                                class="img-fluid rounded {% if not image_url %}d-none{% endif %}" 
+                                style="max-height: 300px;">
+                        </div>
+                        <!-- Image Upload -->
+                        <div class="form-group">
+                            <label for="imageInput" class="btn btn-outline-primary">Choose Image</label>
+                            <input type="file" name="image" id="imageInput" class="form-control-file d-none" accept="image/*" onchange="previewImage(event)">
+                            <label for="submit" class="btn btn-primary">Submit</label>
+                            <input type="submit" id="submit" class="btn btn-primary d-none">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detection Results -->
+        <div class="col-lg-6 p-1">
+            <div class="card shadow-sm" style="height: 500px;">
+                <div class="card-header">
+                    <h5 class="mb-0">Detection Results</h5>
+                </div>
+                <div class="card-body text-center">
+                    {% if detections %}
+                        <img id="detectionImage" src="{{ detection_image_url }}" alt="Detection Results" class="img-fluid rounded">
+                    {% else %}
+                        <p class="text-muted">No detection results to display.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 mb-5">
+        <h5>Previously Submitted Images</h5>
+        <div class="row">
+            {% for img in previous_images|slice:":30" %}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-1 p-1">
+                    <div class="card shadow-sm position-relative image-container">
+                        <img src="{{ img.classification_image.url }}" alt="Submitted Image" class="img-fluid rounded">
+                        <!-- Tooltip -->
+                        <div class="tooltip-prediction">
+                            {{ img.prediction }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

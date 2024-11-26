@@ -2,11 +2,18 @@
 {% load static %}
 
 {% block title %}Dashboard{% endblock %}
+{% block css %}
+<style>
+    .small span {
+        white-space: nowrap; /* 텍스트 개행 방지 */
+    }
+</style>
+{% endblock %}
 {% block container %}
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <h1 class="mb-0 text-primary">Dashboard</h1>
         {% comment %} <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
                 class="fas fa-download fa-sm text-white-50"></i> Generate Report</a> {% endcomment %}
     </div>
@@ -40,11 +47,12 @@
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                Earnings (Annual)</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">$215,000</div>
+                                Total Images
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{all_images_count}}</div>
                         </div>
                         <div class="col-auto">
-                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            <i class="fas fa-image fa-2x text-gray-300"></i>
                         </div>
                     </div>
                 </div>
@@ -109,17 +117,15 @@
                 <!-- Card Header -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Visitor Count Overview</h6>
-                    <div class="dropdown no-arrow">
+                    {% comment %} <div class="dropdown no-arrow">
                         <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                             <div class="dropdown-header">Dropdown Header:</div>
                             <a class="dropdown-item" href="javascript:location.reload()">Refresh</a>
-                            {% comment %} <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Settings</a> {% endcomment %}
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
@@ -133,40 +139,23 @@
         <!-- Pie Chart -->
         <div class="col-xl-4 col-lg-5">
             <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div
-                    class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">Revenue Sources</h6>
-                    <div class="dropdown no-arrow">
-                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <!-- Card Header -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Task Usage Statistics</h6>
+                    {% comment %} <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                            aria-labelledby="dropdownMenuLink">
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
                             <div class="dropdown-header">Dropdown Header:</div>
-                            <a class="dropdown-item" href="#">Action</a>
-                            <a class="dropdown-item" href="#">Another action</a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#">Something else here</a>
+                            <a class="dropdown-item" href="javascript:location.reload()">Refresh</a>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
                 <!-- Card Body -->
                 <div class="card-body">
-                    <div class="chart-pie pt-4 pb-2">
-                        <canvas id="myPieChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center small">
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-primary"></i> Direct
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-success"></i> Social
-                        </span>
-                        <span class="mr-2">
-                            <i class="fas fa-circle text-info"></i> Referral
-                        </span>
+                    <div class="chart-area">
+                        <canvas id="taskPieChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -329,6 +318,7 @@
 {% endblock %}
 {% block js %}
 <script>
+    //Visitor Count Overview
     const visitorCounts = {{ visitor_counts | safe }};
     const labels = {{ visitor_dates | safe }};
 
@@ -367,6 +357,60 @@
             plugins: {
                 legend: { display: false },
             }
+        }
+    });
+
+    // Task Usage Statistics
+    const ctx = document.getElementById('taskPieChart').getContext('2d');
+
+    const taskData = {
+        labels: ['Classification', 'Object Detection', 'OCR', 'Semantic Segmentation'],
+        datasets: [{
+            data: {{ task_images_count }}, // Replace with actual data
+            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e'], // Colors for the segments
+            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf', '#f4b619'], // Hover colors
+            hoverBorderColor: '#ffffff'
+        }]
+    };
+
+    const taskPieChart = new Chart(ctx, {
+        type: 'pie',
+        data: taskData,
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: 'rgb(255,255,255)',
+                bodyFontColor: '#858796',
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: true,
+                caretPadding: 10,
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 15,
+                        font: {
+                            size: 12,
+                            family: 'Nunito',
+                            weight: 'bold'
+                        },
+                    },
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            const value = tooltipItem.raw;
+                            const total = taskData.datasets[0].data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${taskData.labels[tooltipItem.dataIndex]}: ${percentage}%`;
+                        }
+                    }
+                }
+            },
         }
     });
 </script>

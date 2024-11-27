@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.core.paginator import Paginator
 
 from .models import Feedback
 from .forms import FeedbackForm
@@ -9,11 +10,12 @@ from .forms import FeedbackForm
 
 @login_required(login_url="account:login")
 def feedback_list(request):
-    """
-    피드백 목록을 보여주는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
-    """
     feedbacks = Feedback.objects.filter(is_deleted=False).order_by("-created_at")
-    return render(request, "feedback/feedback_list.html", {"feedbacks": feedbacks})
+    paginator = Paginator(feedbacks, 10)  # 페이지당 10개의 피드백 표시
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "feedback/feedback_list.html", {"page_obj": page_obj})
 
 
 @login_required(login_url="account:login")

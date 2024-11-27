@@ -3,6 +3,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 from .models import Question, Answer
 from .forms import QuestionForm, AnswerForm
@@ -14,7 +15,11 @@ def question_list(request):
     질문 목록을 보여주는 뷰입니다. 로그인한 사용자만 접근할 수 있습니다.
     """
     questions = Question.objects.filter(is_deleted=False).order_by("-created_at")
-    return render(request, "QA/question_list.html", {"questions": questions})
+    paginator = Paginator(questions, 10)  # 페이지당 10개의 질문 표시
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)  # 현재 페이지 객체 가져오기
+
+    return render(request, "QA/question_list.html", {"page_obj": page_obj})
 
 
 @login_required(login_url="account:login")

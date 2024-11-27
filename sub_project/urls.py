@@ -19,6 +19,7 @@ urlpatterns = [
     path("objectdetection/", include("objectdetection.urls")),
     path("QA/", include("QA.urls")),
     path("feedback/", include("feedback.urls")),
+    path("guestbook/", include("guestbook.urls")),
     path(
         "password_reset/",
         auth_views.PasswordResetView.as_view(form_class=CustomPasswordResetForm),

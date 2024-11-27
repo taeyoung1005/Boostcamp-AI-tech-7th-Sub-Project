@@ -12,7 +12,8 @@
         <!-- Feedback Content -->
         <div>
             <p class="text-muted small">
-                Submitted by {{ feedback.author.username }} on {{ feedback.created_at|date:"Y-m-d H:i" }}
+                <i class="fas fa-user"></i> {{ feedback.author.username }} |
+                <i class="fas fa-calendar-alt"></i> {{ feedback.created_at|date:"Y-m-d H:i" }}
             </p>
             <hr>
             <p>{{ feedback.content }}</p>
